@@ -1,0 +1,5 @@
+.vscode/*
+config/__pycache__/*
+decryptor/__pycache__/*
+hasher/__pycache__/*
+parser/__pycache__/*
