@@ -1,10 +1,13 @@
 __all__ = ["parseConfig", "printConfig"]
 
 
-def parseConfig(ctx: (str, bytes, list)) -> bytes:
-    malwareFile, configMagic, configDescription = ctx
+def parseConfig(
+    malwareFile: str,
+    configDescription: list,
+    configMagic: bytes = None,
+    configOffset: int = 0,
+) -> bytes:
     configParsed = {}
-    configOffset = 0
 
     with open(malwareFile, "rb") as f:
         if configMagic:
