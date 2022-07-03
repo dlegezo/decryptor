@@ -1,26 +1,30 @@
 __all__ = ["parseConfig", "printConfig"]
 
 
-def handlerAscii(f, len=None, configParsed=None):
+def handlerAscii(raw, len=None, configParsed=None):
     cached = b""
-    while (cached := f.read(1)) != b"\x00":
-        cached += aux
+    offset = 0
+    while raw[offset] != b"\x00":
+        cached += raw[offset]
+        offset += 1
     return str(cached, encoding="UTF8")
 
 
-def handlerWide(f, len=None, configParsed=None):
+def handlerWide(raw, len=None, configParsed=None):
     cached = b""
-    while (aux := f.read(2)) != b"\x00\x00":
+    offset = 0
+    while (aux := raw[offset : offset + 2]) != b"\x00\x00":
         cached += aux
+        offset += 2
     return str(cached, encoding="UTF16")
 
 
 handlers = {
-    "bytes": lambda f, len, configParsed=None: f.read(len),
-    "number": lambda f, len, configParsed=None: int.from_bytes(f.read(len), "little"),
-    "dynamic": lambda f, len, configParsed: f.read(
-        int.from_bytes(configParsed[len], "little")
-    ),
+    "bytes": lambda raw, len, configParsed=None: raw[:len],
+    "number": lambda raw, len, configParsed=None: int.from_bytes(raw[:len], "little"),
+    "dynamic": lambda raw, len, configParsed: raw[
+        : int.from_bytes(configParsed[len], "little")
+    ],
     "ascii": handlerAscii,
     "wide": handlerWide,
 }
@@ -35,13 +39,13 @@ def parseConfig(
     configParsed = {}
 
     with open(malwareFile, "rb") as f:
+        malwareContent = f.read()
         if configMagic:
-            malwareContent = f.read()
             configOffset = f.seek(malwareContent.find(configMagic))
 
         for name, start, len, type in configDescription:
-            f.seek(configOffset + start)
-            configParsed[name] = handlers[type](f, len, configParsed)
+            raw = malwareContent[configOffset + start :]
+            configParsed[name] = handlers[type](raw, len, configParsed)
     return configParsed
 
 
