@@ -3,9 +3,9 @@ __all__ = ["parseConfig", "printConfig"]
 
 def handlerAscii(f, len=None, configParsed=None):
     cached = b""
-    while (aux := f.read(1)) != b"\x00":
+    while (cached := f.read(1)) != b"\x00":
         cached += aux
-    return str(aux, encoding="UTF8")
+    return str(cached, encoding="UTF8")
 
 
 def handlerWide(f, len=None, configParsed=None):
