@@ -2,19 +2,17 @@ __all__ = ["parseConfig", "printConfig"]
 
 
 def handlerAscii(f, len=None, configParsed=None):
-    asciiLen = 0
-    while f.read(1) != b"\x00":
-        asciiLen += 1
-    f.seek(-asciiLen - 1, 1)
-    return str(f.read(asciiLen), encoding="UTF8")
+    cached = b""
+    while (aux := f.read(1)) != b"\x00":
+        cached += aux
+    return str(aux, encoding="UTF8")
 
 
 def handlerWide(f, len=None, configParsed=None):
-    wideLen = 0
-    while f.read(2) != b"\x00\x00":
-        wideLen += 2
-    f.seek(-wideLen - 2, 1)
-    return str(f.read(wideLen), encoding="UTF16")
+    cached = b""
+    while (aux := f.read(2)) != b"\x00\x00":
+        cached += aux
+    return str(cached, encoding="UTF16")
 
 
 handlers = {
