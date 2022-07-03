@@ -1,4 +1,6 @@
 from argparse import ArgumentParser
+
+from more_itertools import pairwise
 from config import (
     configScrambleCrossDecryptedDescription,
     configScrambleCrossHeaderDescription,
